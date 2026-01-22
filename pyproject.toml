@@ -34,17 +34,4 @@ requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = []
 packages = ["nac_uncertainty_regression"]
-
-# "torch==1.12",
-# "torchvision==0.13",
-# "numpy==1.24.3"
-#     "libmr @ git+https://github.com/eric8he/libMR-installbugfix",
-# "Cython",
-#     "diffdist",
-#     "gdown",
-#     "imaug",
-#"faiss-cpu",
-#    "faiss-gpu",
-# "numba>=0.61",
