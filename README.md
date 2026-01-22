@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 ## Overview
 Code for the paper "Franke et al.: Revisiting Neural Activation Coverage for Uncertainty Estimation", accepted for a poster session @ ESANN 2026.
 
-Contains minimal torch reimplementation of https://github.com/BierOne/ood_coverage, extended by a novel formulation for regression problems. Only the uncertainty estimation function is re-implemented.
+Contains minimal torch reimplementation of <https://github.com/BierOne/ood_coverage>, extended by a novel formulation for regression problems. Only the uncertainty estimation function is re-implemented.
 
 ## Install
 Recommended is [UV](https://docs.astral.sh/uv/getting-started/installation/). 
@@ -79,7 +79,7 @@ Run [experiment_ood.bash](./experiment_ood.bash) to reproduce figure 1 and [expe
 Generate the figures with [viz.ipynb](./viz.ipynb).
 
 ## Important Files
-- [nac.py](./nac_uncertainty_regression/nac.py). -> The entire implementation with doc
+- [nac.py](./nac_uncertainty_regression/nac.py) -> The entire implementation with doc
 - [nac_test.py](./nac_test.py) -> Unit Tests
 
 ## How to cite our work?

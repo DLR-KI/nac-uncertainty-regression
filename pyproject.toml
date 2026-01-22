@@ -4,7 +4,9 @@
 
 [project]
 name = "nac-uncertainty-regression"
-version = "1.0"
+version = "1.0.0"
+license = "MIT"
+license-files = ["LICENSE.md", "LICENSES/*"]
 description = "Code for the paper \"Franke et al.: Revisiting Neural Activation Coverage for Uncertainty Estimation\", accepted for a poster session @ ESANN 2026. Contains minimal torch reimplementation of https://github.com/BierOne/ood_coverage, extended by a novel formulation for regression problems. Only the uncertainty estimation function is re-implemented."
 readme = "README.md"
 requires-python = ">=3.13"

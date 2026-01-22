@@ -22,7 +22,7 @@ step () {
     output_file=$4
     echo "Running experiment on $dataset / $uc / seed $seed"
     # Run the experiment and capture output
-    output=$(uv run regression_experiments.py --uncertainty-kind aleatoric --dataset-name "$dataset" --uncertainty-technique "$uc" --activation selu --seed $seed)
+    output=$(uv run regression_experiments.py --uncertainty-kind aleatoric --dataset-name "$dataset" --uncertainty-technique "$uc" --activation selu --seed "$seed")
     # Extract the correlation score using awk
     correlation=$(echo "$output" | awk '/^Correlation is/ { print $3 }')
     d2val=$(echo "$output" | awk '/^Final D2 Validation Score is/ { print $6 }')
@@ -36,7 +36,7 @@ step () {
 for dataset in "${datasets[@]}"; do
     for uc in "${uncertainties[@]}"; do
         for seed in 42 43 44; do
-            step $dataset $uc $seed $output_file
+            step "$dataset" "$uc" "$seed" "$output_file"
         done
     done
 done

@@ -11,11 +11,11 @@ message: >-
   metadata from this file. Add your own description here.
 type: software
 authors:
-  # - given-names: first name of AUTHOR_NAME
-  #   family-names: last name of AUTHOR_NAME
-  #   email: AUTHOR_EMAIL@example.com
-  #   affiliation: German Aerospace Center (DLR)
-  #   orcid: 'https://orcid.org/xxxx-xxxx-xxxx-xxxx'
+  - given-names: Benedikt
+    family-names: Franke
+    email: benedikt.franke@dlr.de
+    affiliation: German Aerospace Center (DLR)
+    orcid: 'https://orcid.org/0000-0003-0202-2804'
   - name: German Aerospace Center (DLR)
     address: Linder Höhe
     city: Cologne

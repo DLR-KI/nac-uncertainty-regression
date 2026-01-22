@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 German Aerospace Center (DLR e.V.)
+# SPDX-License-Identifier: MIT
+
+version = 1
+
+[[annotations]]
+SPDX-FileCopyrightText = "2026 German Aerospace Center (DLR e.V.)"
+SPDX-License-Identifier = "MIT"
+path = ["uv.lock", "viz.ipynb"]
