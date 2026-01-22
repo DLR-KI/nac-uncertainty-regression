@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2026 DLR e.V.
 SPDX-License-Identifier: MIT
 -->
 
-# DLR Reimplementation of Neuron Activation Coverage
+# Revisiting Neuron Activation Coverage for Uncertainty Estimation
 ## Overview
 Code for the paper "Franke et al.: Revisiting Neural Activation Coverage for Uncertainty Estimation", accepted for a poster session @ ESANN 2026.
 

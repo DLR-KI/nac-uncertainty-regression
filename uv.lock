@@ -1041,6 +1041,51 @@ wheels = [
 ]
 
 [[package]]
+name = "nac-uncertainty-regression"
+version = "1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "easydict" },
+    { name = "forbiddenfruit" },
+    { name = "jupyter" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "opencv-python" },
+    { name = "pandas" },
+    { name = "pycocotools" },
+    { name = "pytest" },
+    { name = "pyyaml" },
+    { name = "scikit-learn" },
+    { name = "seaborn" },
+    { name = "torch" },
+    { name = "torchvision" },
+    { name = "tqdm" },
+    { name = "tyro" },
+    { name = "ucimlrepo" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "easydict", specifier = ">=1.13" },
+    { name = "forbiddenfruit", specifier = ">=0.1.4" },
+    { name = "jupyter", specifier = ">=1.1.1" },
+    { name = "matplotlib", specifier = ">=3.10.5" },
+    { name = "numpy" },
+    { name = "opencv-python" },
+    { name = "pandas" },
+    { name = "pycocotools", specifier = ">=2.0.10" },
+    { name = "pytest", specifier = ">=8.4.1" },
+    { name = "pyyaml" },
+    { name = "scikit-learn" },
+    { name = "seaborn", specifier = ">=0.13.2" },
+    { name = "torch", specifier = ">=2.6" },
+    { name = "torchvision" },
+    { name = "tqdm", specifier = ">=4.67.1" },
+    { name = "tyro", specifier = ">=0.9.28" },
+    { name = "ucimlrepo", specifier = ">=0.0.7" },
+]
+
+[[package]]
 name = "nbclient"
 version = "0.10.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2216,51 +2261,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/87/7c/f5a400cc99a5365d153609ebf803084f78b4638b0f7925aa31d9abb62b8e/ucimlrepo-0.0.7.tar.gz", hash = "sha256:4cff3f9e814367dd60956da999ace473197237b9fce4c07e9a689e77b4ffb59a", size = 9369, upload-time = "2024-05-21T06:06:41.465Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3b/07/1252560194df2b4fad1cb3c46081b948331c63eb1bb0b97620d508d12a53/ucimlrepo-0.0.7-py3-none-any.whl", hash = "sha256:0a5ce7e21d7ec850a0da4427c47f9dd96fcc6532f1c7e95dcec63eeb40f08026", size = 8041, upload-time = "2024-05-21T06:06:39.826Z" },
-]
-
-[[package]]
-name = "uncertainty"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "easydict" },
-    { name = "forbiddenfruit" },
-    { name = "jupyter" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "opencv-python" },
-    { name = "pandas" },
-    { name = "pycocotools" },
-    { name = "pytest" },
-    { name = "pyyaml" },
-    { name = "scikit-learn" },
-    { name = "seaborn" },
-    { name = "torch" },
-    { name = "torchvision" },
-    { name = "tqdm" },
-    { name = "tyro" },
-    { name = "ucimlrepo" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "easydict", specifier = ">=1.13" },
-    { name = "forbiddenfruit", specifier = ">=0.1.4" },
-    { name = "jupyter", specifier = ">=1.1.1" },
-    { name = "matplotlib", specifier = ">=3.10.5" },
-    { name = "numpy" },
-    { name = "opencv-python" },
-    { name = "pandas" },
-    { name = "pycocotools", specifier = ">=2.0.10" },
-    { name = "pytest", specifier = ">=8.4.1" },
-    { name = "pyyaml" },
-    { name = "scikit-learn" },
-    { name = "seaborn", specifier = ">=0.13.2" },
-    { name = "torch", specifier = ">=2.6" },
-    { name = "torchvision" },
-    { name = "tqdm", specifier = ">=4.67.1" },
-    { name = "tyro", specifier = ">=0.9.28" },
-    { name = "ucimlrepo", specifier = ">=0.0.7" },
 ]
 
 [[package]]
