@@ -17,11 +17,11 @@ Then run with ```uv run <file>``` or activate the .venv ```./.venv/bin/activate`
 
 If not using UV, install python3.13 and create a venv from pyproject.toml
 
-For using only the NAC-Wrapper in your own project, we recommend doing ```uv add git+https://github.com/DLR-KI/nac-uncertainty-regression```.
+For using only the NAC-Wrapper in your own project, we recommend doing ```uv add git+https://github.com/DLR-KI/nac-uncertainty-regression```., or simply copy ```nac_uncertainty_regression/nac.py``` into your project.
 
 ## Usage
 ```python
-from nac-uncertainty-regression.nac import NACWrapper
+from nac_uncertainty_regression import NACWrapper
 
 # init pretrained model + wrap it
 model = ResNet50(pretrained=True)
@@ -47,7 +47,7 @@ Run [experiment_ood.bash](./experiment_ood.bash) to reproduce figure 1 and [expe
 Generate the figures with [viz.ipynb](./viz.ipynb).
 
 ## Important Files
-- [nac.py](./nac.py). -> The entire implementation with doc
+- [nac.py](./nac_uncertainty_regression/nac.py). -> The entire implementation with doc
 - [nac_test.py](./nac_test.py) -> Unit Tests
 
 ## How to cite our work?
