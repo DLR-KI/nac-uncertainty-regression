@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2026 DLR e.V.
+#
+# SPDX-License-Identifier: MIT
+
+[project]
+name = "nac-uncertainty-regression"
+version = "1.0"
+description = "Code for the paper "Franke et al.: Revisiting Neural Activation Coverage for Uncertainty Estimation", accepted for a poster session @ ESANN 2026. Contains minimal torch reimplementation of https://github.com/BierOne/ood_coverage, extended by a novel formulation for regression problems. Only the uncertainty estimation function is re-implemented."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy",
+    "scikit-learn",
+    "torch>=2.6",
+    "torchvision",
+    "opencv-python",
+    "pandas",
+    "pyyaml",
+    "scikit-learn",
+    "jupyter>=1.1.1",
+    "easydict>=1.13",
+    "pytest>=8.4.1",
+    "matplotlib>=3.10.5",
+    "tqdm>=4.67.1",
+    "ucimlrepo>=0.0.7",
+    "pycocotools>=2.0.10",
+    "forbiddenfruit>=0.1.4",
+    "tyro>=0.9.28",
+    "seaborn>=0.13.2",
+]
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = []
+
+# "torch==1.12",
+# "torchvision==0.13",
+# "numpy==1.24.3"
+#     "libmr @ git+https://github.com/eric8he/libMR-installbugfix",
+# "Cython",
+#     "diffdist",
+#     "gdown",
+#     "imaug",
+#"faiss-cpu",
+#    "faiss-gpu",
+# "numba>=0.61",
