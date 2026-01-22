@@ -4,7 +4,7 @@
 
 from ast import mod
 import torch
-from nac import NACWrapper, NACMode
+from nac_uncertainty_regression.nac import NACWrapper, NACMode
 import pytest
 
 class TestNACWrapper:

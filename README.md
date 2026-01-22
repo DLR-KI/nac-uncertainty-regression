@@ -17,11 +17,13 @@ Then run with ```uv run <file>``` or activate the .venv ```./.venv/bin/activate`
 
 If not using UV, install python3.13 and create a venv from pyproject.toml
 
+For using only the NAC-Wrapper in your own project, we recommend doing ```uv add git+https://github.com/DLR-KI/nac-uncertainty-regression```.
+
 ## Usage
 ```python
-from nac import NACWrapper
+from nac-uncertainty-regression.nac import NACWrapper
 
-# init rtained model + wrap it
+# init pretrained model + wrap it
 model = ResNet50(pretrained=True)
 model = NACWrapper(model)
 # IMPORTANT: Do NOT use 'with torch.no_grad()', NACWrapper needs gradients internally! 

@@ -2,21 +2,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-from turtle import forward
 from typing import Literal
 import torch
-from traitlets import default
 import tyro
-from nac import NACWrapper, NACMode
+from nac_uncertainty_regression.nac import NACWrapper, NACMode
 import matplotlib.pyplot as plt
-from sys import argv
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_percentage_error, d2_absolute_error_score
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 from ucimlrepo import fetch_ucirepo 
-from copy import deepcopy
 from scipy.stats import spearmanr
 
 
