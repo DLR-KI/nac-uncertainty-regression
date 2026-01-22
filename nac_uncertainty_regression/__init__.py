@@ -1,1 +1,1 @@
-from nac import NACWrapper
+from .nac import NACWrapper
