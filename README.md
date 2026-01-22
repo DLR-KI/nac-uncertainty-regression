@@ -21,11 +21,17 @@ For using only the NAC-Wrapper in your own project, we recommend doing ```uv add
 
 ## Usage
 ```python
+import torch
 from nac_uncertainty_regression import NACWrapper
 
 # init pretrained model + wrap it
 model = ResNet50(pretrained=True)
 model = NACWrapper(model)
+
+# define your data somehow
+id_data_loader = torch.utils.data.DataLoader(...)
+potentially_ood_batch = torch.tensor(...)
+
 # IMPORTANT: Do NOT use 'with torch.no_grad()', NACWrapper needs gradients internally! 
 # It will check if gradients are enabled and throw an error if not.
 
@@ -52,7 +58,7 @@ Generate the figures with [viz.ipynb](./viz.ipynb).
 
 ## How to cite our work?
 If you find the code or results useful, please cite the paper
-```(bibtex)
+```bibtex
 @inproceedings{franke2026revisiting,
   title={Revisiting Neural Activation Coverage for Uncertainty Estimation},
   author={Franke, Benedikt and Förster, Nils and and Köster, Frank and Fischer, Asja and Lange, Markus and Raulf, Arne Peter},
