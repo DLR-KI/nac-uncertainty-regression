@@ -422,7 +422,7 @@ class NACWrapper(torch.nn.Module):
         self.stats_sum_squares = output_dict["stats_sum_squares"] # type: ignore
         out["uncertainty"] = output_dict["uncertainty"]
         end = time.time()
-        print(f"Processed {len(x)} images in {end - start:.2f} seconds.")
+        # print(f"Processed {len(x)} images in {end - start:.2f} seconds.")
         return out
 
     def _get_layer_activations_and_reset(self) -> dict[str, torch.Tensor]:

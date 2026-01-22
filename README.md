@@ -19,33 +19,59 @@ If not using UV, install python3.13 and create a venv from pyproject.toml
 
 For using only the NAC-Wrapper in your own project, we recommend doing ```uv add git+https://github.com/DLR-KI/nac-uncertainty-regression```., or simply copy ```nac_uncertainty_regression/nac.py``` into your project.
 
-## Usage
+## Usage (Minimum Runnable Example)
 ```python
 import torch
 from nac_uncertainty_regression import NACWrapper
+from torchvision.models import resnet18, ResNet18_Weights
+from torchvision.datasets import Imagenette, MNIST
+from torchvision.transforms.v2 import Compose, RGB
 
 # init pretrained model + wrap it
-model = ResNet50(pretrained=True)
-model = NACWrapper(model)
+model = resnet18(pretrained=True)
+model = NACWrapper(model, 
+                   layer_name_list=[
+                       "layer1.1.bn2",      # use dot notation to access nested layers
+                       "layer2.1.bn2",
+                       "layer3.1.bn2",
+                       "layer4.1.bn2",
+                       "fc"
+                   ])
 
-# define your data somehow
-id_data_loader = torch.utils.data.DataLoader(...)
-potentially_ood_batch = torch.tensor(...)
+transform = ResNet18_Weights.IMAGENET1K_V1.transforms()
+
+# define your data somehow - insert your own data here, just make sure the id_data is actually part of your model's training distribution
+id_data_loader_fit = torch.utils.data.DataLoader(torch.utils.data.Subset(Imagenette(root="data/imagenette", download=True, transform=transform), indices=range(1024)), batch_size=32)
+id_data_loader_eval = torch.utils.data.DataLoader(Imagenette(root="data/imagenette", download=True, transform=transform, split="val"), batch_size=32)
+ood_data_loader = torch.utils.data.DataLoader(torch.utils.data.Subset(MNIST(root="data/mnist", download=True, transform=Compose([RGB(), transform])), indices=range(32)), batch_size=32)
 
 # IMPORTANT: Do NOT use 'with torch.no_grad()', NACWrapper needs gradients internally! 
 # It will check if gradients are enabled and throw an error if not.
 
 # do some forward passes with I.D. Data to init the wrapper distribution
 model.train()
-for x, y in id_data_loader:
+for x, y in id_data_loader_fit:
   # only the call to forward is important 
   _ = model(x)
 
 # set the model to eval to get uncertainty scores
 model.eval()
-res = model(potentially_ood_batch)
-print(res["uncertainty"]) # the model outputs are saved in key "out"
+# first get ID uncertainty scores
+for x, y in id_data_loader_eval:
+    uncertainties = model(x)["uncertainty"]
+    mean_uncertainty_id = uncertainties.mean()    # the model outputs are saved in key "out", uncertainty in key "uncertainty"
+    std_uncertainty_id = uncertainties.std()
+    break
 
+# now get OOD uncertainty scores
+for x, y in ood_data_loader:
+    uncertainties = model(x)["uncertainty"]
+    mean_uncertainty_ood = uncertainties.mean() 
+    std_uncertainty_ood = uncertainties.std()
+    break
+
+print(f"Mean ID Uncertainty Score: {mean_uncertainty_id}+-{std_uncertainty_id}") 
+print(f"Mean OoD Uncertainty Score: {mean_uncertainty_ood}+-{std_uncertainty_ood}") 
 ```
 
 ## Reproducing our Results
