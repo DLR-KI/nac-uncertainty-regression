@@ -5,7 +5,7 @@
 # https://citation-file-format.github.io/cff-initializer-javascript/#/update
 #
 cff-version: 1.2.0
-title: nac-uncertainty-regression
+title: Revisiting Neuron Activation Coverage for Uncertainty Estimation
 message: >-
   If you use this software, please cite it using the
   metadata from this file. Add your own description here.
@@ -16,6 +16,9 @@ authors:
     email: benedikt.franke@dlr.de
     affiliation: German Aerospace Center (DLR)
     orcid: 'https://orcid.org/0000-0003-0202-2804'
+  - family-names: "Förster"
+    given-names: "Nils"
+    affiliation: German Aerospace Center (DLR)
   - name: German Aerospace Center (DLR)
     address: Linder Höhe
     city: Cologne
@@ -26,12 +29,29 @@ authors:
     tel: '+49 2203 6010'
 repository-code: 'http://github.com/DLR-KI/nac-uncertainty-regression'
 url: 'https://www.dlr.de/en/ki'
-# abstract: >-
-#   Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-#   At vero eos et accusam et justo duo dolores et ea rebum.
-#   Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 keywords:
   - dlr
+  - Uncertainty Estimation
+  - Neural Activation Coverage
 # commit: 7c84121c656b3e9d66b074dc2f91d9c6f14202e8 (commit ID from the release commit)
-# version: 0.0.1
-# date-released: '1997-01-01'
+# version: 1.0.0
+# date-released: '2026-02-01'
+preferred-citation:
+  type: conference-paper
+  authors:
+    - family-names: "Franke"
+      given-names: "Benedikt"
+    - family-names: "Förster"
+      given-names: "Nils"
+    - family-names: "Köster"
+      given-names: "Frank"
+    - family-names: "Fischer"
+      given-names: "Asja"
+    - family-names: "Lange"
+      given-names: "Markus"
+    - family-names: "Raulf"
+      given-names: "Arne"
+  title: "Revisiting Neuron Activation Coverage for Uncertainty Estimation"
+  booktitle: "34th European Symposium on Artificial Neural Networks, Computational Intelligence and Machine Learning, ESANN 2026 (Scopus; ISSN:)"
+  year: 2026
+  doi: "10.xxxx/xxxx"
