@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from ast import mod
 import torch
 from nac_uncertainty_regression.nac import NACWrapper, NACMode
 import pytest
@@ -34,7 +33,7 @@ class TestNACWrapper:
         torch.testing.assert_close(torch.tensor([[[[0.5, 0.5],
                                                     [1, 1]],
                                                   [[0.5, 0.5],
-                                                    [1, 1]]]]), 
+                                                    [1, 1]]]]),
                                    wrapped_layer.cache[0])
 
     def test_saving_histograms(self):
@@ -48,7 +47,7 @@ class TestNACWrapper:
         # batch size was one, so each histogram should have been updated with one entry
         assert torch.sum(self.wrapper.histograms["0"][0]) == 1
         assert torch.sum(self.wrapper.histograms["0"][1]) == 1
-        
+
     def test_uncertainty_computation(self):
         x = torch.rand(1, 1, 28, 28)
         self.wrapper.train()
@@ -112,7 +111,7 @@ class TestNACWrapper:
 
         with torch.no_grad():
             test_outputs = model(test_samples)
-            test_preds = torch.argmax(test_outputs, dim=-1) 
+            test_preds = torch.argmax(test_outputs, dim=-1)
             print("Test samples predictions:", test_preds.squeeze().tolist())
 
         model = NACWrapper(model, layer_name_list=["0", "2"], O=100)

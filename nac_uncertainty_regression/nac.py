@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from contextlib import contextmanager
-import time
 import torch
 from enum import Enum, auto
 
@@ -51,10 +50,10 @@ def _compute_loss_classification(network_output: torch.Tensor, network_output_ke
     if n_classes > 1:
         uniform_label = 1 / n_classes
         kl_div = - uniform_label * torch.sum(torch.nn.functional.log_softmax(network_output, dim=-1), dim=-1) # type: ignore
-        
+
     else:
         kl_div = - 0.5 * (torch.nn.functional.logsigmoid(network_output) + torch.log(1 - torch.sigmoid(network_output)))        # a single output neuron should output 0.5 if maximally unsure
-        
+
     return kl_div
 
 
@@ -82,7 +81,7 @@ def _compute_neuron_activation_states(network_output: torch.Tensor, layer_activa
                                       network_output_key: str | None = None, mode: NACMode = NACMode.CLASSIFICATION,
                                       class_dimension: int = -1) -> dict[str, torch.Tensor]:
     """Given the final network output and the corresponding activations of intermediate layers, this method computes the activations tates of the neurons
-    gby backproagating from the KLdivergence between the network output and a uniform vector.
+    by backpropagating from the KLdivergence between the network output and a uniform vector.
 
     Args:
         network_output (torch.Tensor): final logits of network, shape (batch_size, n_classes)
@@ -97,7 +96,7 @@ def _compute_neuron_activation_states(network_output: torch.Tensor, layer_activa
         loss = _compute_loss_regression(network_output, stats_n, stats_sum, stats_sum_squares, device)
     else:
         raise NotImplementedError(f"Mode {mode} is not implemented")
-    
+
     neuron_activation_states = {}
 
     for name in layers_to_monitor:
@@ -133,9 +132,9 @@ def _compute_histogram_updates(network_output: torch.Tensor, layer_activations: 
         layer_activations (dict[str, torch.Tensor]): Layer activations of the current batch.
     """
     neuron_activation_states = _compute_neuron_activation_states(
-        network_output=network_output, 
-        layer_activations=layer_activations, 
-        stats_n=stats_n, 
+        network_output=network_output,
+        layer_activations=layer_activations,
+        stats_n=stats_n,
         stats_sum=stats_sum,
         stats_sum_squares=stats_sum_squares,
         layers_to_monitor=layers_to_monitor,
@@ -150,7 +149,7 @@ def _compute_histogram_updates(network_output: torch.Tensor, layer_activations: 
         histogram_updates[name] = torch.zeros((neuron_activation_states[name].shape[1], M), device=device).detach() # type: ignore
         for i_neuron in range(neuron_activation_states[name].shape[1]):
             histogram_updates[name][i_neuron] += torch.histc(neuron_activation_states[name][:, i_neuron], bins=M, min=0, max=1) # type: ignore
-            
+
     return histogram_updates
 
 @torch.jit.script
@@ -159,7 +158,7 @@ def _compute_uncertainty(network_output: torch.Tensor, layer_activations: dict[s
                          layers_to_monitor: list[str], alpha: float, network_output_key: str | None,
                          mode: NACMode, class_dimension: int, histograms: dict[str, torch.Tensor],
                          M: int, O: int, device: device) -> torch.Tensor:
-    """Computes the instance-wise uncertainty a given entwork output and corresponding intermediate layer activations.
+    """Computes the instance-wise uncertainty a given network output and corresponding intermediate layer activations.
         This assumes that self.histogram has been fitted!
 
     Args:
@@ -170,9 +169,9 @@ def _compute_uncertainty(network_output: torch.Tensor, layer_activations: dict[s
         torch.Tensor: Uncertainty tensor (float), shape (batch_size,)
     """
     neuron_activation_states = _compute_neuron_activation_states(
-        network_output=network_output, 
-        layer_activations=layer_activations, 
-        stats_n=stats_n, 
+        network_output=network_output,
+        layer_activations=layer_activations,
+        stats_n=stats_n,
         stats_sum=stats_sum,
         stats_sum_squares=stats_sum_squares,
         layers_to_monitor=layers_to_monitor,
@@ -196,22 +195,22 @@ def _compute_uncertainty(network_output: torch.Tensor, layer_activations: dict[s
         layer_score = clamped_values.sum(dim=1) / neuron_activation_states[name].shape[1]
         uncertainty += layer_score
 
-    return (1 / uncertainty)  # the stadard NAC score is how *common* the activation pattern was, so uncertainty should be the inverse!
+    return (1 / uncertainty)  # the standard NAC score is how *common* the activation pattern was, so uncertainty should be the inverse!
 
 @torch.jit.script
-def _nac_forward(layer_activations: dict[str, torch.Tensor], 
-                 net_output: torch.Tensor, 
+def _nac_forward(layer_activations: dict[str, torch.Tensor],
+                 net_output: torch.Tensor,
                  training: bool,
                  stats_n: int,
                  stats_sum: torch.Tensor,
                  stats_sum_squares: torch.Tensor,
                  histograms: dict[str, torch.Tensor],
                  layers_to_monitor: list[str],
-                 alpha: float, 
+                 alpha: float,
                  network_output_key: str | None,
-                 mode: NACMode, 
-                 class_dimension: int, 
-                 M: int, 
+                 mode: NACMode,
+                 class_dimension: int,
+                 M: int,
                  O: int,
                  device: device
                  ) -> dict[str, int | torch.Tensor | dict[str, torch.Tensor]]:
@@ -223,10 +222,10 @@ def _nac_forward(layer_activations: dict[str, torch.Tensor],
             net_output, stats_n, stats_sum, stats_sum_squares
         )
         histogram_update = _compute_histogram_updates(
-            network_output=net_output, 
+            network_output=net_output,
             layer_activations=layer_activations,
-            stats_n=stats_n, 
-            stats_sum=stats_sum, 
+            stats_n=stats_n,
+            stats_sum=stats_sum,
             stats_sum_squares=stats_sum_squares,
             layers_to_monitor=layers_to_monitor,
             alpha=alpha,
@@ -243,10 +242,10 @@ def _nac_forward(layer_activations: dict[str, torch.Tensor],
                 histograms[name] += histogram_update[name]
             else:
                 histograms[name] = histogram_update[name]
-        
+
     else:
         output = _compute_uncertainty( # type: ignore
-            network_output=net_output, 
+            network_output=net_output,
             layer_activations=layer_activations,
             stats_n=stats_n,
             stats_sum=stats_sum,
@@ -260,7 +259,7 @@ def _nac_forward(layer_activations: dict[str, torch.Tensor],
             M=M,
             O=O,
             device=device)
-            
+
     return dict(
         uncertainty=output,
         histograms=histograms,
@@ -271,7 +270,7 @@ def _nac_forward(layer_activations: dict[str, torch.Tensor],
 
 
 class NACWrapper(torch.nn.Module):
-    
+
     class ActivationCachingWrapper(torch.nn.Module):
         def __init__(self, module: torch.nn.Module, name: str):
             """Caches the activations of the provided torch.nn.Module
@@ -314,11 +313,11 @@ class NACWrapper(torch.nn.Module):
             self.reset()
             return tmp
 
-    def __init__(self, model: torch.nn.Module, 
+    def __init__(self, model: torch.nn.Module,
                  layer_name_list: list[str],
                  mode: NACMode = NACMode.CLASSIFICATION,
                  O: int = 2000,
-                 alpha: float = 100, 
+                 alpha: float = 100,
                  M: int = 50,
                  confidence_cutoff: float = 0.1,
                  class_dimension: int = -1,
@@ -328,7 +327,7 @@ class NACWrapper(torch.nn.Module):
         for selected layers over I.D. data. Epistemic uncertainty can then be calculated for unseen data from the distribution.
         Hyperparameter search over [O, alpha, M] should be considered, as the values are strongly dataset-dependant.
 
-        Note that it is assumed that the model is already trained. If raw model access is needed (e.g. for fine-tuning), 
+        Note that it is assumed that the model is already trained. If raw model access is needed (e.g. for fine-tuning),
         use the context manager NACWrapper.raw_model_access. Note that it would be best to re-fit the Wrapper after changing anything about the model.
 
         Args:
@@ -342,7 +341,7 @@ class NACWrapper(torch.nn.Module):
         super().__init__()
         if not torch.is_grad_enabled():
             raise RuntimeError("NACWrapper requires gradient computation to be enabled! Please do not disable gradients!")
-        
+
         self.layers_to_monitor = layer_name_list
         self._model = model
         self._model.eval()       # we freeze the model to eval mode
@@ -356,7 +355,7 @@ class NACWrapper(torch.nn.Module):
             recursive_setattr(model, name, NACWrapper.ActivationCachingWrapper(recursive_getattr(model, name), name)) # type: ignore
 
         if device is None:
-            self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             for name in layer_name_list:
                 try:
                     self.device = recursive_getattr(self._model, name).module.device # type: ignore
@@ -364,9 +363,9 @@ class NACWrapper(torch.nn.Module):
                     pass
         else:
             self.device = device
-        
+
         self.histograms: dict[str, torch.Tensor] = {
-            layer_name: torch.tensor(0, device=self.device) 
+            layer_name: torch.tensor(0, device=self.device)
             for layer_name in layer_name_list
         }
         self.train()
@@ -374,14 +373,14 @@ class NACWrapper(torch.nn.Module):
         self.stats_sum: torch.Tensor = torch.tensor(0, device=self.device)
         self.stats_sum_squares: torch.Tensor = torch.tensor(0, device=self.device)
         self.network_output_key = network_output_key
-    
+
 
     def forward(self, x: torch.Tensor) -> dict[str, torch.Tensor | None]:
         """Calls forward on the wrapped model and computes the uncertainty for eeach sample.
         Result of wrapped model is stored in "out" key. Uncertainty is stored in "uncertainty" key.
-        WARNING: 
-        Uncertainty is only computed if wrapper is in eval() mode. 
-        In train() mode, the data is implicitly assumed to be in-distribution, 
+        WARNING:
+        Uncertainty is only computed if wrapper is in eval() mode.
+        In train() mode, the data is implicitly assumed to be in-distribution,
         used for updating the internal uncertainty estimator and the uncertainty is None!
 
         Args:
@@ -390,18 +389,17 @@ class NACWrapper(torch.nn.Module):
         Returns:
             dict[str, torch.Tensor | None]: dict with keys "uncertainty" and "out"
         """
-        start = time.time()
         out =  {"out": self._model(x)}
         net_output = out["out"] if self.network_output_key is None else out["out"][self.network_output_key]
         if len(net_output.shape) > 2:
             assert len(net_output.shape) == 3, f"ndim={len(net_output.shape)} is unsupported!"
             net_output_ = torch.max(net_output, dim=1).values
-        else: 
+        else:
             net_output_ = net_output
         layer_activations = self._get_layer_activations()
         output_dict = _nac_forward(
-            layer_activations=layer_activations,  
-            net_output=net_output_, 
+            layer_activations=layer_activations,
+            net_output=net_output_,
             training=self.training,
             stats_n=self.stats_n, # type: ignore
             stats_sum=self.stats_sum,
@@ -421,8 +419,6 @@ class NACWrapper(torch.nn.Module):
         self.stats_sum = output_dict["stats_sum"] # type: ignore
         self.stats_sum_squares = output_dict["stats_sum_squares"] # type: ignore
         out["uncertainty"] = output_dict["uncertainty"]
-        end = time.time()
-        # print(f"Processed {len(x)} images in {end - start:.2f} seconds.")
         return out
 
     def _get_layer_activations_and_reset(self) -> dict[str, torch.Tensor]:
@@ -437,7 +433,6 @@ class NACWrapper(torch.nn.Module):
             # TODO: this is an ugly fix for the detached gradient problem, but we somehow need the list
             ls[name] = wrapped_layer.cache[0]
             wrapped_layer.reset()
-
         return ls
 
     def _get_layer_activations(self) -> dict[str, torch.Tensor]:
@@ -484,8 +479,8 @@ class NACWrapper(torch.nn.Module):
 
     @contextmanager
     def raw_model_access(self, training: bool = True):
-        """Use this context manager to access the raw model, e.g. for re-training. 
-        It ensures that the training state ofg the wrapper and of the model are properly seperated.
+        """Use this context manager to access the raw model, e.g. for re-training.
+        It ensures that the training state ofg the wrapper and of the model are properly separated.
 
         Args:
             training (bool, optional): Wether to set the model to train() when returning it. Defaults to True.
@@ -499,7 +494,3 @@ class NACWrapper(torch.nn.Module):
             yield self._model
         finally:
             self._model.eval()
-
-
-
-
