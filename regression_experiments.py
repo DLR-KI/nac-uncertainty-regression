@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_percentage_error, d2_absolute_error_score
 from sklearn.preprocessing import StandardScaler
 import numpy as np
-from ucimlrepo import fetch_ucirepo 
+from ucimlrepo import fetch_ucirepo
 from scipy.stats import spearmanr
 
 
@@ -64,7 +64,7 @@ def prepare_data(X: pd.DataFrame, y: pd.DataFrame):
         shuffle=True,
         batch_size=256
     )
-    X_ood = generate_ood(X_test.copy())             
+    X_ood = generate_ood(X_test.copy())
     dl_ood = torch.utils.data.DataLoader(
         torch.utils.data.TensorDataset(
             torch.tensor(X_ood),
@@ -84,36 +84,36 @@ def generate_ood(data: np.ndarray):
     return data.astype(np.float32)
 
 def setup_abalone():
-    # fetch dataset 
-    abalone = fetch_ucirepo(id=1) 
-    # data (as pandas dataframes) 
+    # fetch dataset
+    abalone = fetch_ucirepo(id=1)
+    # data (as pandas dataframes)
     X = abalone.data.features  # type: ignore
     X = pd.get_dummies(X, columns=["Sex"]).astype(np.float32)
     y = abalone.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
-    
+
 def setup_obesity():
-    # fetch dataset 
-    data = fetch_ucirepo(id=544) 
-    # data (as pandas dataframes) 
+    # fetch dataset
+    data = fetch_ucirepo(id=544)
+    # data (as pandas dataframes)
     X = pd.get_dummies(data.data.features, columns=["Gender", "CAEC", "CALC", "MTRANS"]) # type: ignore
     X = pd.get_dummies(X, columns=["family_history_with_overweight", "FAVC", "SMOKE", "SCC"], drop_first=True).astype(np.float32)
     y = data.data.targets # type: ignore
     y["NObeyesdad"] = y["NObeyesdad"].map({
-        "Insufficient_Weight": -1, 
-        "Normal_Weight": 0, 
-        "Overweight_Level_I": 1, 
-        "Overweight_Level_II": 2, 
-        "Obesity_Type_I": 3, 
+        "Insufficient_Weight": -1,
+        "Normal_Weight": 0,
+        "Overweight_Level_I": 1,
+        "Overweight_Level_II": 2,
+        "Obesity_Type_I": 3,
         "Obesity_Type_II": 4,
         "Obesity_Type_III": 5
     }).astype(np.float32)
     return prepare_data(X, y)
 
 def setup_bikeshare():
-    # fetch dataset 
-    data = fetch_ucirepo(id=275) 
-    # data (as pandas dataframes) 
+    # fetch dataset
+    data = fetch_ucirepo(id=275)
+    # data (as pandas dataframes)
     X = data.data.features # type: ignore
     X.drop(["dteday"], axis=1, inplace=True)
     X = X.astype(np.float32)
@@ -122,45 +122,45 @@ def setup_bikeshare():
 
 
 def setup_wine():
-    # fetch dataset 
-    data = fetch_ucirepo(id=186) 
-    # data (as pandas dataframes) 
+    # fetch dataset
+    data = fetch_ucirepo(id=186)
+    # data (as pandas dataframes)
     X = data.data.features.astype(np.float32) # type: ignore
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
 def setup_forest():
-    # fetch dataset 
-    data = fetch_ucirepo(id=162) 
+    # fetch dataset
+    data = fetch_ucirepo(id=162)
     X = data.data.features # type: ignore
     X = pd.get_dummies(X, columns=["month", "day"]).astype(np.float32)
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
 def setup_real_estate():
-    # fetch dataset 
-    data = fetch_ucirepo(id=477) 
+    # fetch dataset
+    data = fetch_ucirepo(id=477)
     X = data.data.features.astype(np.float32) # type: ignore
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
 def setup_concrete():
-    # fetch dataset 
-    data = fetch_ucirepo(id=165) 
+    # fetch dataset
+    data = fetch_ucirepo(id=165)
     X = data.data.features.astype(np.float32) # type: ignore
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
 def setup_liver():
-    # fetch dataset 
-    data = fetch_ucirepo(id=60) 
+    # fetch dataset
+    data = fetch_ucirepo(id=60)
     X = data.data.features.astype(np.float32) # type: ignore
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
 def setup_solar_flare():
-    # fetch dataset 
-    data = fetch_ucirepo(id=89) 
+    # fetch dataset
+    data = fetch_ucirepo(id=89)
     X = pd.get_dummies(data.data.features,  # type: ignore
         columns=["modified Zurich class", "largest spot size", "spot distribution"]
         ).astype(np.float32)
@@ -168,15 +168,15 @@ def setup_solar_flare():
     return prepare_data(X, y)
 
 def setup_grid():
-    # fetch dataset 
-    data = fetch_ucirepo(id=471) 
+    # fetch dataset
+    data = fetch_ucirepo(id=471)
     X = data.data.features.astype(np.float32) # type: ignore
     y = data.data.targets[["stab"]].astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
 def setup_conductivity():
-    # fetch dataset 
-    data = fetch_ucirepo(id=464) 
+    # fetch dataset
+    data = fetch_ucirepo(id=464)
     X = data.data.features.astype(np.float32) # type: ignore
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
@@ -239,7 +239,7 @@ class EnsembleWrapper(torch.nn.Module):
             return dict(
                 out=torch.mean(results, dim=0),
                 uncertainty=torch.std(results, dim=0).squeeze(dim=1)
-            )    
+            )
 
 
 def train_model(data_loader, model, optimizer, criterion, inv_label_fn):
@@ -265,7 +265,7 @@ def train_model(data_loader, model, optimizer, criterion, inv_label_fn):
     return total_loss / len(data_loader.dataset), \
             mean_absolute_percentage_error(inv_label_fn(all_labels), inv_label_fn(all_preds)), \
             d2_absolute_error_score(inv_label_fn(all_labels), inv_label_fn(all_preds))
-            
+
 
 def evaluate_model(data_loader, model, criterion, inv_label_fn):
     model.eval()
@@ -306,7 +306,7 @@ class MCWrapper(torch.nn.Module):
         return dict(out=mean_softmax, uncertainty=uncertainty[torch.arange(len(uncertainty)), pred])
 
 
-def evaluate_uncertainty_epistemic(model: NACWrapper | MCWrapper | EnsembleWrapper, dl_val: torch.utils.data.DataLoader, dl_ood: torch.utils.data.DataLoader):    
+def evaluate_uncertainty_epistemic(model: NACWrapper | MCWrapper | EnsembleWrapper, dl_val: torch.utils.data.DataLoader, dl_ood: torch.utils.data.DataLoader):
     model.eval()        # from now, we get uncertainty estimates
     uncertainty_scores_known = []
     uncertainty_scores_unknown = []
@@ -397,14 +397,14 @@ def param_sweep_nac(model_: torch.nn.Module, dl_train: torch.utils.data.DataLoad
                         best_model = model
 
     print("Finished param sweep!")
-    assert best_model is not None   
+    assert best_model is not None
     return best_model
-                    
 
-def main(dataset_name: Literal["wine", "abalone", "bikeshare", "obesity", "forest", 
-                               "realestate", "concrete", "liver", "grid", 
-                               "conductivity"] = "wine", 
-         uncertainty_technique: Literal["nac", "mcdropout", "ensemble"] = "nac", 
+
+def main(dataset_name: Literal["wine", "abalone", "bikeshare", "obesity", "forest",
+                               "realestate", "concrete", "liver", "grid",
+                               "conductivity"] = "wine",
+         uncertainty_technique: Literal["nac", "mcdropout", "ensemble"] = "nac",
          uncertainty_kind: Literal["epistemic", "aleatoric"] = "epistemic",
          activation: Literal["relu", "selu"] = "relu",
          epochs=1000, seed=0):

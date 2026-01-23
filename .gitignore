@@ -9,6 +9,9 @@ results
 ood_results
 coverage_cache
 figures
+correlation_results.csv
+correlation_results_aleatoric.csv
+regression_results.pgf
 
 ######### vscode
 .vscode

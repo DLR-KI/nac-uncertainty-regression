@@ -5,13 +5,16 @@ SPDX-License-Identifier: MIT
 -->
 
 # Revisiting Neuron Activation Coverage for Uncertainty Estimation
+
 ## Overview
+
 Code for the paper "Franke et al.: Revisiting Neural Activation Coverage for Uncertainty Estimation", accepted for a poster session @ ESANN 2026.
 
 Contains minimal torch reimplementation of <https://github.com/BierOne/ood_coverage>, extended by a novel formulation for regression problems. Only the uncertainty estimation function is re-implemented.
 
 ## Install
-Recommended is [UV](https://docs.astral.sh/uv/getting-started/installation/). 
+
+Recommended is [UV](https://docs.astral.sh/uv/getting-started/installation/).
 Run ```uv sync``` to create the .venv.
 Then run with ```uv run <file>``` or activate the .venv ```./.venv/bin/activate``` and run as normal ```python <file>```
 
@@ -20,6 +23,7 @@ If not using UV, install python3.13 and create a venv from pyproject.toml
 For using only the NAC-Wrapper in your own project, we recommend doing ```uv add git+https://github.com/DLR-KI/nac-uncertainty-regression```., or simply copy ```nac_uncertainty_regression/nac.py``` into your project.
 
 ## Usage (Minimum Runnable Example)
+
 ```python
 import torch
 from nac_uncertainty_regression import NACWrapper
@@ -75,15 +79,19 @@ print(f"Mean OoD Uncertainty Score: {mean_uncertainty_ood}+-{std_uncertainty_ood
 ```
 
 ## Reproducing our Results
+
 Run [experiment_ood.bash](./experiment_ood.bash) to reproduce figure 1 and [experiment_mse.bash](./experiment_mse.bash) to reproduce figure 2.
 Generate the figures with [viz.ipynb](./viz.ipynb).
 
 ## Important Files
+
 - [nac.py](./nac_uncertainty_regression/nac.py) -> The entire implementation with doc
 - [nac_test.py](./nac_test.py) -> Unit Tests
 
 ## How to cite our work?
-If you find the code or results useful, please cite the paper
+
+If you find the code or results useful, please cite the paper:
+
 ```bibtex
 @inproceedings{franke2026revisiting,
   title={Revisiting Neural Activation Coverage for Uncertainty Estimation},
