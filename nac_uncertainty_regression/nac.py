@@ -12,6 +12,15 @@ torch.set_num_interop_threads(8)
 torch.set_num_threads(16)
 
 def recursive_getattr(obj: object, key: str) -> object:
+    """Used to get nested attributes in dot-notation, e.g. "model.layer1.block3.fc"
+
+    Args:
+        obj (object): Object to get attribute from
+        key (str): name of the attribute(s) in dot notation
+
+    Returns:
+        object: the desired attribute
+    """
     obj_ = obj
     for sub_key in key.split("."):
         obj_ = getattr(obj_, sub_key)
@@ -19,6 +28,14 @@ def recursive_getattr(obj: object, key: str) -> object:
     return obj_
 
 def recursive_setattr(obj: object, key: str, value: object):
+    """Used to set nested attributes in dot-notation, e.g. "model.layer1.block3.fc"
+
+    Args:
+        obj (object): Object to get attribute from
+        key (str): name of the attribute(s) in dot notation
+        value (object): Value to be set as the attribute
+
+    """
     obj_ = obj
     for sub_key in key.split(".")[:-1]:
         obj_ = getattr(obj_, sub_key)
@@ -26,6 +43,9 @@ def recursive_setattr(obj: object, key: str, value: object):
     setattr(obj_, key.split(".")[-1], value)
 
 class NACMode(Enum):
+    """
+    Enum controlling the mode NAC should be used in. Currently only "classification" and "regression" are supported.
+    """
     CLASSIFICATION = auto()
     REGRESSION = auto()
 
@@ -38,6 +58,9 @@ def _compute_loss_classification(network_output: torch.Tensor, network_output_ke
 
     Args:
         network_output (torch.Tensor): final logits of network, shape (batch_size, n_classes)
+        network_output_key (str | None): key that identifies the relevant network output if network outputs a dict, ignored otherwise
+        device (device): Ignored, only here for API consistency
+        class_dimension (int, optional): index of the class logits. Defaults to -1.
 
     Returns:
         torch.Tensor: KL Divergence value, shape (batch_size,)
@@ -51,8 +74,10 @@ def _compute_loss_classification(network_output: torch.Tensor, network_output_ke
         uniform_label = 1 / n_classes
         kl_div = - uniform_label * torch.sum(torch.nn.functional.log_softmax(network_output, dim=-1), dim=-1) # type: ignore
 
+
     else:
         kl_div = - 0.5 * (torch.nn.functional.logsigmoid(network_output) + torch.log(1 - torch.sigmoid(network_output)))        # a single output neuron should output 0.5 if maximally unsure
+
 
     return kl_div
 
@@ -64,9 +89,13 @@ def _compute_loss_regression(network_output: torch.Tensor, n: int, sum: torch.Te
 
     Args:
         network_output (torch.Tensor): final logits of network, shape (batch_size, n_outputs)
+        n (int): number of data points for running mean and std
+        sum (torch.Tensor): sum for running mean and std
+        sum_squares (torch.Tensor): sum of squares for runnign mean and std
+        device (device): device to compute on
 
     Returns:
-        torch.Tensor: _description_
+        torch.Tensor: mahalanobis distance between network output and distribution mean
     """
     mean_output = torch.as_tensor(sum / n, device=device) # type: ignore
     std_deviation = torch.sqrt(sum_squares / n - torch.square(torch.as_tensor(sum / n, device=device))) # type: ignore
@@ -86,6 +115,19 @@ def _compute_neuron_activation_states(network_output: torch.Tensor, layer_activa
     Args:
         network_output (torch.Tensor): final logits of network, shape (batch_size, n_classes)
         layer_activations (dict[str, torch.Tensor]): dict of (layer_name -> raw activation map / vector)
+        stats_n (int): number of data points for running mean and std
+        stats_sum (torch.Tensor): sum for running mean and std
+        stats_sum_squares (torch.Tensor): sum of squares for runnign mean and std
+        layers_to_monitor (list[str]): list of layer names (in dot notation) to compute activation states on
+        device (device): device to compute on
+        alpha (float, optional): sharpness of sigmoid. Defaults to 100.
+        network_output_key (str | None, optional): key that identifies the relevant network output if network outputs a dict, ignored otherwise. Defaults to None.
+        mode (NACMode, optional): Use Enum to specify type of ML-problem. Defaults to NACMode.CLASSIFICATION.
+        class_dimension (int, optional): index of the class logits. Defaults to -1.
+
+    Raises:
+        NotImplementedError: If mode is not classification or regression (shouldn't happen)
+        RuntimeError: If Gradient Computation fails for any reason
 
     Returns:
         dict[str, torch.Tensor]: the states of the neurons as dict of (layer_name -> tensor of neuron states, shape (batch_size, n_neurons))
@@ -114,6 +156,17 @@ def _compute_neuron_activation_states(network_output: torch.Tensor, layer_activa
 
 @torch.jit.script
 def _update_network_stats(network_output: torch.Tensor, n: int, sum: torch.Tensor, sum_squares: torch.Tensor) -> tuple[int, torch.Tensor, torch.Tensor]:
+    """
+    update running stats for keeping track of output distribution
+    Args:
+        network_output (torch.Tensor): output of the neural network
+        n (int): number of data points already seen in the running stats
+        sum (torch.Tensor): sum of outputs for running stats
+        sum_squares (torch.Tensor): sum of squared outputs for running stats
+
+    Returns:
+        tuple[int, torch.Tensor, torch.Tensor]: tuple of updated (n, sum, sum_squares) after observing network_output
+    """
     if n == 0:
         return network_output.shape[0], network_output.sum(dim=0), torch.square(network_output).sum(dim=0)
 
@@ -125,11 +178,25 @@ def _compute_histogram_updates(network_output: torch.Tensor, layer_activations: 
                       layers_to_monitor: list[str], alpha: float, network_output_key: str | None,
                       mode: NACMode, class_dimension: int, histograms: dict[str, torch.Tensor],
                       M: int, device: device) -> dict[str, torch.Tensor]:
-    """Updates the internal histogram for I.D. data.
-
+    """
+    Updates the internal histogram for I.D. data.
     Args:
         network_output (torch.Tensor): Raw logits of network output for the current batch.
         layer_activations (dict[str, torch.Tensor]): Layer activations of the current batch.
+        stats_n (int): number of data points already seen in the running stats
+        stats_sum (torch.Tensor): sum of outputs for running stats
+        stats_sum_squares (torch.Tensor): sum of squared outputs for running stats
+        layers_to_monitor (list[str]): list of layer names (in dot notation) to compute activation states on
+        alpha (float): sharpness of sigmoid.
+        network_output_key (str | None): key that identifies the relevant network output if network outputs a dict, ignored otherwise.
+        mode (NACMode): Use Enum to specify type of ML-problem.
+        class_dimension (int): index of the class logits.
+        histograms (dict[str, torch.Tensor]): dict mapping layer names to the corresponding histograms of activations
+        M (int): Hyperparameter controlling the number of histogram bins
+        device (device): device to compute on
+
+    Returns:
+        dict[str, torch.Tensor]: additive updates to histograms of neuron activation
     """
     neuron_activation_states = _compute_neuron_activation_states(
         network_output=network_output,
@@ -164,6 +231,18 @@ def _compute_uncertainty(network_output: torch.Tensor, layer_activations: dict[s
     Args:
         network_output (torch.Tensor): final logits of network, shape (batch_size, n_classes)
         layer_activations (dict[str, torch.Tensor]): dict of (layer_name -> raw activation map / vector)
+        stats_n (int): number of data points already seen in the running stats
+        stats_sum (torch.Tensor): sum of outputs for running stats
+        stats_sum_squares (torch.Tensor): sum of squared outputs for running stats
+        layers_to_monitor (list[str]): list of layer names (in dot notation) to compute activation states on
+        alpha (float): sharpness of sigmoid.
+        network_output_key (str | None): key that identifies the relevant network output if network outputs a dict, ignored otherwise.
+        mode (NACMode): Use Enum to specify type of ML-problem.
+        class_dimension (int): index of the class logits.
+        histograms (dict[str, torch.Tensor]): dict mapping layer names to the corresponding histograms of activations
+        M (int): Hyperparameter controlling the number of histogram bins
+        O (int): Hyperparameter controlling the number of data points before one histogram bin is considered "full"
+        device (device): device to compute on
 
     Returns:
         torch.Tensor: Uncertainty tensor (float), shape (batch_size,)
@@ -214,6 +293,34 @@ def _nac_forward(layer_activations: dict[str, torch.Tensor],
                  O: int,
                  device: device
                  ) -> dict[str, int | torch.Tensor | dict[str, torch.Tensor]]:
+    """Entry function for internal NAC calculations. Updates hisograms with I.D. data during configuration phase (training),
+    computes uncertainty otherwise.
+
+    Args:
+        layer_activations (dict[str, torch.Tensor]): dict of (layer_name -> raw activation map / vector)
+        net_output (torch.Tensor): final logits of network, shape (batch_size, n_classes)
+        training (bool): _description_
+        stats_n (int): number of data points already seen in the running stats
+        stats_sum (torch.Tensor): sum of outputs for running stats
+        stats_sum_squares (torch.Tensor): sum of squared outputs for running stats
+        histograms (dict[str, torch.Tensor]): dict mapping layer names to the corresponding histograms of activations
+        layers_to_monitor (list[str]): list of layer names (in dot notation) to compute activation states on
+        alpha (float): sharpness of sigmoid.
+        network_output_key (str | None): key that identifies the relevant network output if network outputs a dict, ignored otherwise.
+        mode (NACMode): Use Enum to specify type of ML-problem.
+        class_dimension (int): index of the class logits.
+        M (int): Hyperparameter controlling the number of histogram bins
+        O (int): Hyperparameter controlling the number of data points before one histogram bin is considered "full"
+        device (device): device to compute on
+
+    Returns:
+        dict[str, int | torch.Tensor | dict[str, torch.Tensor]]: dict with keys:
+            uncertainty: contains uncertainty values if training == False
+            histograms: contains (additive) histogram updates if training == True
+            stats_n: Contains number of data points for running stats
+            stats_sum: Contains sum of activations for running stats
+            stats_sum_squares: Contains sum of squares of activations for running stats
+    """
     output = torch.zeros(len(net_output))
     if training:
         # for dim_idx in range(net_output_view.shape[1]):
@@ -281,6 +388,7 @@ class NACWrapper(torch.nn.Module):
             print(model.layer1.pop_all())       # retrieve last activations and empty the cache
             Args:
                 module (torch.nn.Module): the module to be wrapped
+                name (str): name of the layer for debugging and logging purposes
             """
             super().__init__()
             self.cache: list[torch.Tensor] = []     # list as an attribute is not torch-script compatible... We need a different solution!
@@ -288,8 +396,11 @@ class NACWrapper(torch.nn.Module):
             self.name = name
 
         def forward(self, x: torch.Tensor) -> torch.Tensor:
-            """ Calls forward on the underlying module and caches the result
+            """Calls forward on the underlying module and caches the result
             Module output can then be retrieved with .pop_all()
+            Args:
+                x (torch.Tensor): Input to the layer
+
             Returns:
                 torch.Tensor: the result of forward on the underlying module
             """
@@ -333,10 +444,17 @@ class NACWrapper(torch.nn.Module):
         Args:
             model (torch.nn.Module): The torch model to wrap
             layer_name_list (Iterable[str]): list of the attribute names of the layers that should be monitored, e.g. "layer1" in resnet
+            mode (NACMode): Indicate if underlying problem is Classification or Regression
             O (int, optional): Number of samples until a bin is considered 'filled'. A good default is (1 / M) * dataset_size. Defaults to 2000.
             alpha (float, optional): Sharpness of Sigmoid function. Defaults to 100.
             M (int, optional): Number of histogram bins. Defaults to 50.
+            confidence_cutoff (float): Unused, for future extension.
             class_dimension (int, optional): Index of the class dimension of the network output. Defaults to -1.
+            network_output_key (str, Optional): key that identifies the relevant network output if network outputs a dict, ignored otherwise.
+            device (device): torch-device to compute on
+
+        Raises:
+            RuntimeError: If GradientComputation is disabled
         """
         super().__init__()
         if not torch.is_grad_enabled():
@@ -450,6 +568,8 @@ class NACWrapper(torch.nn.Module):
         return ls
 
     def _reset_layer_activations(self) -> None:
+        """Reset all cached layer activations
+        """
         for name in self.layers_to_monitor:
             wrapped_layer: "NACWrapper.ActivationCachingWrapper" = recursive_getattr(self._model, name) # type: ignore
             wrapped_layer.reset()
