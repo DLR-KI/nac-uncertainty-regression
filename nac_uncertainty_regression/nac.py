@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 from contextlib import contextmanager
-import torch
 from enum import Enum, auto
 
+import torch
 from torch._C import device
 
 torch.set_num_interop_threads(8)

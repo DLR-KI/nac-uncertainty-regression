@@ -6,21 +6,43 @@ SPDX-License-Identifier: MIT
 
 # Revisiting Neuron Activation Coverage for Uncertainty Estimation
 
+[![Language](https://img.shields.io/github/languages/top/DLR-KI/nac-uncertainty-regression?style=flat)](https://github.com/DLR-KI/nac-uncertainty-regression)
+
+[![GitHub Stars](https://img.shields.io/github/stars/DLR-KI/nac-uncertainty-regression.svg?style=social&label=Star)](https://github.com/DLR-KI/nac-uncertainty-regression) 
+&nbsp;
+[![GitHub Downloads](https://img.shields.io/github/downloads/DLR-KI/nac-uncertainty-regression/total?style=social)](https://github.com/DLR-KI/nac-uncertainty-regression/releases) 
+
+[![License](https://img.shields.io/github/license/DLR-KI/nac-uncertainty-regression?color=green&style=flat)](https://github.com/DLR-KI/nac-uncertainty-regression/LICENSE)
+&nbsp;
+![Size](https://img.shields.io/github/repo-size/DLR-KI/nac-uncertainty-regression?style=flat)
+&nbsp;
+[![Issues](https://img.shields.io/github/issues/DLR-KI/nac-uncertainty-regression?style=flat)](https://github.com/DLR-KI/nac-uncertainty-regression/issues)
+&nbsp;
+[![Latest Release](https://img.shields.io/github/v/release/DLR-KI/nac-uncertainty-regression?style=flat)](https://github.com/DLR-KI/nac-uncertainty-regression/)
+&nbsp;
+[![Release Date](https://img.shields.io/github/release-date/DLR-KI/nac-uncertainty-regression?style=flat)](https://github.com/DLR-KI/nac-uncertainty-regression/releases)
+
+***
+
+
 ## Overview
 
-Code for the paper "Franke et al.: Revisiting Neural Activation Coverage for Uncertainty Estimation", accepted for a poster session @ ESANN 2026.
+Code for the paper "**Franke et al.: Revisiting Neural Activation Coverage for Uncertainty Estimation**", accepted for a poster session @ **ESANN 2026**.
 
-Contains minimal torch reimplementation of <https://github.com/BierOne/ood_coverage>, extended by a novel formulation for regression problems. Only the uncertainty estimation function is re-implemented.
+Contains minimal torch reimplementation of <https://github.com/BierOne/ood_coverage>, extended by a novel formulation for regression problems.
+Only the uncertainty estimation function is re-implemented.
 
 ## Install
 
-Recommended is [UV](https://docs.astral.sh/uv/getting-started/installation/).
-Run ```uv sync``` to create the .venv.
-Then run with ```uv run <file>``` or activate the .venv ```./.venv/bin/activate``` and run as normal ```python <file>```
+We recommend using [UV](https://docs.astral.sh/uv/getting-started/installation/) for dependency management.
+Run ```uv sync``` to create the _.venv_.
+Then run ```uv run <file>``` or activate the .venv by using ```./.venv/bin/activate```.
+To run a script use ```python <file>```, like normal.
 
-If not using UV, install python3.13 and create a venv from pyproject.toml
+If not using _UV_, install _python3.13_ and create the _.venv_ derived from the [pyproject.toml](./pyproject.toml)  in the repository root.
 
-For using only the NAC-Wrapper in your own project, we recommend doing ```uv add git+https://github.com/DLR-KI/nac-uncertainty-regression```., or simply copy ```nac_uncertainty_regression/nac.py``` into your project.
+For using only the NAC-Wrapper in your own project, we recommend doing ```uv add git+https://github.com/DLR-KI/nac-uncertainty-regression```.
+Alternatively you can simply copy ```nac_uncertainty_regression/nac.py``` into your project.
 
 ## Usage (Minimum Runnable Example)
 
@@ -80,12 +102,12 @@ print(f"Mean OoD Uncertainty Score: {mean_uncertainty_ood}+-{std_uncertainty_ood
 
 ## Reproducing our Results
 
-Run [experiment_ood.bash](./experiment_ood.bash) to reproduce figure 1 and [experiment_mse.bash](./experiment_mse.bash) to reproduce figure 2.
-Generate the figures with [viz.ipynb](./viz.ipynb).
+Run [experiment_ood.bash](./experiment_ood.bash) to reproduce Figure 1 and [experiment_mse.bash](./experiment_mse.bash) to reproduce Figure 2.
+Generate the Figures with [viz.ipynb](./viz.ipynb).
 
 ## Important Files
 
-- [nac.py](./nac_uncertainty_regression/nac.py) -> The entire implementation with doc
+- [nac.py](./nac_uncertainty_regression/nac.py) -> The entire implementation alongside documentation
 - [nac_test.py](./nac_test.py) -> Unit Tests
 
 ## How to cite our work?

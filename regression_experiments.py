@@ -3,18 +3,19 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Literal
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import torch
 import tyro
-from nac_uncertainty_regression.nac import NACWrapper, NACMode
-import matplotlib.pyplot as plt
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_percentage_error, d2_absolute_error_score
-from sklearn.preprocessing import StandardScaler
-import numpy as np
-from ucimlrepo import fetch_ucirepo
 from scipy.stats import spearmanr
+from sklearn.metrics import mean_absolute_percentage_error, d2_absolute_error_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from ucimlrepo import fetch_ucirepo
 
+from nac_uncertainty_regression.nac import NACWrapper, NACMode
 
 plt.rcParams.update({
     "text.usetex": True,
@@ -24,6 +25,7 @@ plt.rcParams.update({
 
 
 MODE = "SELU"
+
 
 def prepare_data(X: pd.DataFrame, y: pd.DataFrame):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
@@ -75,6 +77,7 @@ def prepare_data(X: pd.DataFrame, y: pd.DataFrame):
     )
     return dl_train, dl_val, dl_test, dl_ood, sc_labels.inverse_transform
 
+
 def generate_ood(data: np.ndarray):
     mean = data.mean(axis=0)
     std = data.std(axis=0)
@@ -82,6 +85,7 @@ def generate_ood(data: np.ndarray):
     # data = np.random.normal(loc=np.random.choice([1, -1]) * (mean + 2 * std), scale=std/2, size=data.shape) + data
     data += np.random.normal(loc=mean + 10 * std, scale=std/2, size=data.shape)
     return data.astype(np.float32)
+
 
 def setup_abalone():
     # fetch dataset
@@ -91,6 +95,7 @@ def setup_abalone():
     X = pd.get_dummies(X, columns=["Sex"]).astype(np.float32)
     y = abalone.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
+
 
 def setup_obesity():
     # fetch dataset
@@ -109,6 +114,7 @@ def setup_obesity():
         "Obesity_Type_III": 5
     }).astype(np.float32)
     return prepare_data(X, y)
+
 
 def setup_bikeshare():
     # fetch dataset
@@ -129,6 +135,7 @@ def setup_wine():
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
+
 def setup_forest():
     # fetch dataset
     data = fetch_ucirepo(id=162)
@@ -137,12 +144,14 @@ def setup_forest():
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
+
 def setup_real_estate():
     # fetch dataset
     data = fetch_ucirepo(id=477)
     X = data.data.features.astype(np.float32) # type: ignore
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
+
 
 def setup_concrete():
     # fetch dataset
@@ -151,12 +160,14 @@ def setup_concrete():
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
+
 def setup_liver():
     # fetch dataset
     data = fetch_ucirepo(id=60)
     X = data.data.features.astype(np.float32) # type: ignore
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
+
 
 def setup_solar_flare():
     # fetch dataset
@@ -167,12 +178,14 @@ def setup_solar_flare():
     y = data.data.targets.astype(np.float32) # type: ignore
     return prepare_data(X, y)
 
+
 def setup_grid():
     # fetch dataset
     data = fetch_ucirepo(id=471)
     X = data.data.features.astype(np.float32) # type: ignore
     y = data.data.targets[["stab"]].astype(np.float32) # type: ignore
     return prepare_data(X, y)
+
 
 def setup_conductivity():
     # fetch dataset
@@ -190,6 +203,7 @@ class MCDropout(torch.nn.Dropout):
     def eval(self):
         super().train()
         return self
+
 
 def get_model(activation: str, uncertainty_technique, n_output: int = 1):
     act = torch.nn.SELU if activation == "SELU" else torch.nn.ReLU
@@ -339,6 +353,7 @@ def evaluate_uncertainty_epistemic(model: NACWrapper | MCWrapper | EnsembleWrapp
     # )[0, 1]
     correlation = spearmanr(correlation_dset[:, 0], correlation_dset[:, 1]).statistic # type: ignore
     print(f"Correlation is {correlation}")
+
 
 def evaluate_uncertainty_aleatoric(model: NACWrapper | MCWrapper | EnsembleWrapper, dl_val: torch.utils.data.DataLoader):
     model.eval()        # from now, we get uncertainty estimates

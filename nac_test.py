@@ -2,9 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-import torch
-from nac_uncertainty_regression.nac import NACWrapper, NACMode
 import pytest
+import torch
+
+from nac_uncertainty_regression.nac import NACWrapper, NACMode
+
 
 class TestNACWrapper:
     def setup_method(self):
