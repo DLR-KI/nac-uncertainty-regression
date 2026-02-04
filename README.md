@@ -11,6 +11,8 @@ SPDX-License-Identifier: MIT
 [![GitHub Stars](https://img.shields.io/github/stars/DLR-KI/nac-uncertainty-regression.svg?style=social&label=Star)](https://github.com/DLR-KI/nac-uncertainty-regression) 
 &nbsp;
 [![GitHub Downloads](https://img.shields.io/github/downloads/DLR-KI/nac-uncertainty-regression/total?style=social)](https://github.com/DLR-KI/nac-uncertainty-regression/releases) 
+&nbsp;
+![REUSE Compliance](https://img.shields.io/reuse/compliance/https%3A%2F%2Fgithub.com%2FDLR-KI%2Fnac-uncertainty-regression)
 
 ![License](https://img.shields.io/github/license/DLR-KI/nac-uncertainty-regression)
 &nbsp;
