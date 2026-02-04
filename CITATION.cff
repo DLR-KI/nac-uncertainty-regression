@@ -33,9 +33,9 @@ keywords:
   - dlr
   - Uncertainty Estimation
   - Neural Activation Coverage
-# commit: 7c84121c656b3e9d66b074dc2f91d9c6f14202e8 (commit ID from the release commit)
-# version: 1.0.0
-# date-released: '2026-02-01'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.18479022
 preferred-citation:
   type: conference-paper
   authors:
@@ -54,4 +54,3 @@ preferred-citation:
   title: "Revisiting Neuron Activation Coverage for Uncertainty Estimation"
   booktitle: "34th European Symposium on Artificial Neural Networks, Computational Intelligence and Machine Learning, ESANN 2026 (Scopus; ISSN:)"
   year: 2026
-  doi: "10.xxxx/xxxx"
