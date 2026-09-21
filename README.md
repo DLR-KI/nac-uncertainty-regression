@@ -6,6 +6,8 @@ SPDX-License-Identifier: MIT
 
 # Revisiting Neuron Activation Coverage for Uncertainty Estimation
 
+This repository is archived. Updated work will be published under [![this repo](https://github.com/DLR-KI/PyNAC).
+
 [![Language](https://img.shields.io/github/languages/top/DLR-KI/nac-uncertainty-regression?style=flat)](https://github.com/DLR-KI/nac-uncertainty-regression)
 
 [![GitHub Stars](https://img.shields.io/github/stars/DLR-KI/nac-uncertainty-regression.svg?style=social&label=Star)](https://github.com/DLR-KI/nac-uncertainty-regression) 
